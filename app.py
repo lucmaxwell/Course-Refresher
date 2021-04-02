@@ -20,17 +20,26 @@ browser.get('https://www.beartracks.ualberta.ca/')
 
 time.sleep(logInTime)
 
+iterable = True
+
+photos = ['0', '0']
+browser.refresh()
+time.sleep(timeBetweenScreenshots)
+browser.save_screenshot(f"screenshot{int(iterable)}.png")
+with open(f"screenshot{int(iterable)}.png", 'rb') as image:
+    hexa = binascii.hexlify(image.read())
+photos[int(iterable)] = hexa
+iterable = not iterable
+
 while True:
     try:
-        photos = []
-
-        for i in range(2): #Take 2 photos to compare
-            browser.refresh()
-            time.sleep(timeBetweenScreenshots)    
-            browser.save_screenshot(f"screenshot{i}.png")
-            with open(f"screenshot{i}.png", 'rb') as image:
-                hexa = binascii.hexlify(image.read())
-            photos.append(hexa)
+        browser.refresh()
+        time.sleep(timeBetweenScreenshots)
+        browser.save_screenshot(f"screenshot{int(iterable)}.png")
+        with open(f"screenshot{int(iterable)}.png", 'rb') as image:
+            hexa = binascii.hexlify(image.read())
+        photos[int(iterable)] = hexa
+        iterable = not iterable
 
         if photos[0] == photos[1]: 
             print("No changes detected. Searching again for changes. ")
@@ -43,7 +52,8 @@ while True:
                 time.sleep(timeBetweenClicks)
                 button = browser.find_element_by_xpath(i)
                 ActionChains(browser).move_to_element(button).click(button).perform()
-            message = input("Type 'exit' and then press enter to continue running the program. Click any other key and press enter to exit the program. ")
+            time.sleep(10)
+            message = input("Type 'exit' and then press enter to exit the program. Press any other key(s) and press enter to continue running the program. ")
             if message.strip() == 'exit' or message.strip() == 'Exit':
                 break
     except:
