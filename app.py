@@ -20,32 +20,34 @@ browser.get('https://www.beartracks.ualberta.ca/')
 
 time.sleep(logInTime)
 
-
 while True:
     try:
         photos = []
 
         for i in range(2): #Take 2 photos to compare
             browser.refresh()
-
             time.sleep(timeBetweenScreenshots)    
-
             browser.save_screenshot(f"screenshot{i}.png")
-
             with open(f"screenshot{i}.png", 'rb') as image:
                 hexa = binascii.hexlify(image.read())
-
             photos.append(hexa)
 
         if photos[0] == photos[1]: 
+            print("No changes detected. Searching again for changes. ")
             time.sleep(refreshTime)
             raise Exception("No change")
 
         else:
+            print("Changes detected. Clicking buttons set to be clicked. ")
             for i in btnToClick:
                 time.sleep(timeBetweenClicks)
                 button = browser.find_element_by_xpath(i)
                 ActionChains(browser).move_to_element(button).click(button).perform()
+            message = input("Type 'exit' and then press enter to continue running the program. Click any other key and press enter to exit the program. ")
+            if message.strip() == 'exit' or message.strip() == 'Exit':
+                break
+    except:
+        pass
 
 
-#browser.close()
+browser.close()
